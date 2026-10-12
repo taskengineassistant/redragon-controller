@@ -18,7 +18,7 @@ permissions:
 jobs:
   build-windows:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     
     steps:
       - name: Checkout
@@ -39,12 +39,40 @@ jobs:
       - name: Create icon
         run: python scripts/create_icon.py
       
+      - name: Build Tray App Executable (PyInstaller)
+        run: |
+          pyinstaller --clean --noconfirm ^
+            --name=redragon-tray ^
+            --onefile ^
+            --windowed ^
+            --icon=assets/redragon.ico ^
+            --add-data "config;config" ^
+            --add-data "assets;assets" ^
+            --add-data "src/redragon_controller/gui;gui" ^
+            --hidden-import=hidapi ^
+            --hidden-import=pyyaml ^
+            --hidden-import=click ^
+            --hidden-import=rich ^
+            --hidden-import=pydantic ^
+            --hidden-import=pydantic_settings ^
+            --hidden-import=PySide6.QtCore ^
+            --hidden-import=PySide6.QtWidgets ^
+            --hidden-import=PySide6.QtGui ^
+            --hidden-import=PySide6.QtSvg ^
+            --hidden-import=win32serviceutil ^
+            --hidden-import=win32service ^
+            --hidden-import=win32event ^
+            --hidden-import=servicemanager ^
+            --collect-all=redragon_controller ^
+            src/redragon_controller/tray_app.py
+        shell: cmd
+      
       - name: Build CLI Executable (PyInstaller)
         run: |
           pyinstaller --clean --noconfirm ^
-            --name=redragon-controller ^
+            --name=redragon-cli ^
             --onefile ^
-            --windowed ^
+            --console ^
             --icon=assets/redragon.ico ^
             --add-data "config;config" ^
             --add-data "assets;assets" ^
@@ -52,14 +80,8 @@ jobs:
             --hidden-import=pyyaml ^
             --hidden-import=click ^
             --hidden-import=rich ^
-            --hidden-import=fastapi ^
-            --hidden-import=uvicorn ^
             --hidden-import=pydantic ^
             --hidden-import=pydantic_settings ^
-            --hidden-import=win32serviceutil ^
-            --hidden-import=win32service ^
-            --hidden-import=win32event ^
-            --hidden-import=servicemanager ^
             --collect-all=redragon_controller ^
             src/redragon_controller/cli.py
         shell: cmd
@@ -77,8 +99,6 @@ jobs:
             --hidden-import=pyyaml ^
             --hidden-import=click ^
             --hidden-import=rich ^
-            --hidden-import=fastapi ^
-            --hidden-import=uvicorn ^
             --hidden-import=pydantic ^
             --hidden-import=pydantic_settings ^
             --hidden-import=win32serviceutil ^
@@ -91,12 +111,25 @@ jobs:
       
       - name: Verify executables
         run: |
-          .\dist\redragon-controller.exe --help
+          .\dist\redragon-cli.exe --help
           .\dist\redragon-service.exe --help
         shell: pwsh
       
       - name: Create installer scripts
         run: |
+          @"
+          @echo off
+          echo Installing Redragon Controller Tray App...
+          echo.
+          echo The tray app will start automatically on login.
+          echo.
+          echo To add to startup:
+          echo   1. Press Win+R, type: shell:startup
+          echo   2. Create shortcut to redragon-tray.exe in that folder
+          echo.
+          pause
+          "@ | Out-File -Encoding ASCII dist/install_tray.bat
+          
           @"
           @echo off
           echo Installing Redragon Controller Service...
@@ -106,8 +139,6 @@ jobs:
           redragon-service.exe start
           echo.
           echo Service installed and started!
-          echo API available at: http://localhost:8080
-          echo Web UI: http://localhost:8080
           echo.
           pause
           "@ | Out-File -Encoding ASCII dist/install_service.bat
@@ -136,8 +167,10 @@ jobs:
         with:
           name: redragon-controller-windows
           path: |
-            dist/redragon-controller.exe
+            dist/redragon-tray.exe
+            dist/redragon-cli.exe
             dist/redragon-service.exe
+            dist/install_tray.bat
             dist/install_service.bat
             dist/uninstall_service.bat
           retention-days: 90
@@ -147,8 +180,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            dist/redragon-controller.exe
+            dist/redragon-tray.exe
+            dist/redragon-cli.exe
             dist/redragon-service.exe
+            dist/install_tray.bat
             dist/install_service.bat
             dist/uninstall_service.bat
             ${{ env.RELEASE_ZIP }}
@@ -158,7 +193,7 @@ jobs:
 
   build-windows-nuitka:
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     
     steps:
       - uses: actions/checkout@v4
@@ -177,7 +212,25 @@ jobs:
       - name: Create icon
         run: python scripts/create_icon.py
       
-      - name: Build with Nuitka
+      - name: Build Tray App with Nuitka
+        run: |
+          python -m nuitka ^
+            --standalone ^
+            --onefile ^
+            --windows-console-mode=disable ^
+            --windows-icon-from-ico=assets/redragon.ico ^
+            --include-package=redragon_controller ^
+            --include-data-dir=config=config ^
+            --include-data-dir=assets=assets ^
+            --include-data-dir=src/redragon_controller/gui=gui ^
+            --enable-plugin=pywin32 ^
+            --enable-plugin=pyside6 ^
+            --output-dir=dist_nuitka ^
+            --output-filename=redragon-tray-nuitka.exe ^
+            src/redragon_controller/tray_app.py
+        shell: cmd
+      
+      - name: Build CLI with Nuitka
         run: |
           python -m nuitka ^
             --standalone ^
@@ -189,13 +242,15 @@ jobs:
             --include-data-dir=assets=assets ^
             --enable-plugin=pywin32 ^
             --output-dir=dist_nuitka ^
-            --output-filename=redragon-controller-nuitka.exe ^
+            --output-filename=redragon-cli-nuitka.exe ^
             src/redragon_controller/cli.py
         shell: cmd
       
-      - name: Upload Nuitka artifact
+      - name: Upload Nuitka artifacts
         uses: actions/upload-artifact@v4
         with:
           name: redragon-controller-nuitka
-          path: dist_nuitka/redragon-controller-nuitka.exe
+          path: |
+            dist_nuitka/redragon-tray-nuitka.exe
+            dist_nuitka/redragon-cli-nuitka.exe
           retention-days: 90

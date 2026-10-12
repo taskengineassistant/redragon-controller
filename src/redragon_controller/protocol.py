@@ -91,6 +91,15 @@ class KeyActionType(IntEnum):
     NONE = 0xFF           # Disabled
 
 
+class ProfileCommand(IntEnum):
+    """Profile sub-commands."""
+    SAVE = 0x00
+    LOAD = 0x01
+    ACTIVATE = 0x02
+    GET_INFO = 0x03
+    DELETE = 0x04
+
+
 @dataclass
 class KeyAction:
     """Represents a key action (remap, macro, layer, etc.)."""
@@ -261,3 +270,8 @@ def cmd_load_profile(slot: int) -> bytes:
 def cmd_get_device_info() -> bytes:
     """Build SYS_GET_INFO command."""
     return build_command(Command.SYS_GET_INFO, b"")
+
+
+def cmd_activate_profile(slot: int) -> bytes:
+    """Build PROFILE_SET_ACTIVE command."""
+    return build_command(Command.PROFILE_SET_ACTIVE, bytes([slot]))

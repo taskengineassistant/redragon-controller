@@ -1,7 +1,7 @@
 [project]
 name = "redragon-controller"
 version = "0.1.0"
-description = "Cross-platform Redragon RGB keyboard controller"
+description = "Cross-platform Redragon RGB keyboard controller with modern German GUI"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
@@ -25,26 +25,29 @@ dependencies = [
     "pyyaml>=6.0",
     "click>=8.1",
     "rich>=13.0",
-    "fastapi>=0.109",
-    "uvicorn>=0.27",
     "pydantic>=2.5",
     "pydantic-settings>=2.1",
+    "PySide6>=6.6",
 ]
-optional-dependencies = {dev = ["pytest>=7.4", "pytest-asyncio>=0.23", "pytest-cov>=4.1", "ruff>=0.1", "mypy>=1.8", "pre-commit>=3.6"], web = ["jinja2>=3.1", "websockets>=12.0"], windows = ["pywin32>=306", "winsvc>=0.1"], build = ["pyinstaller>=6.0", "nuitka>=1.0"]}
+optional-dependencies = {dev = ["pytest>=7.4", "pytest-asyncio>=0.23", "pytest-cov>=4.1", "ruff>=0.1", "mypy>=1.8", "pre-commit>=3.6"], web = ["fastapi>=0.109", "uvicorn>=0.27", "jinja2>=3.1", "websockets>=12.0"], windows = ["pywin32>=306", "winsvc>=0.1"], build = ["pyinstaller>=6.0", "nuitka>=1.0"]}
 
 [project.scripts]
 redragon = "redragon_controller.cli:main"
-redragon-api = "redragon_controller.api:run_server"
-redragon-service = "redragon_controller.windows_service:main"
+redragon-gui = "redragon_controller.gui:main"
+redragon-tray = "redragon_controller.tray_app:main"
 
 [project.entry-points."console_scripts"]
 redragon = "redragon_controller.cli:main"
-redragon-api = "redragon_controller.api:run_server"
+redragon-gui = "redragon_controller.gui:main"
+redragon-tray = "redragon_controller.tray_app:main"
 redragon-service = "redragon_controller.windows_service:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["redragon_controller*"]
+
+[tool.setuptools.package-data]
+redragon_controller = ["config/*", "assets/*", "gui/*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -64,18 +67,20 @@ disallow_untyped_defs = true
 [tool.pyinstaller]
 name = "redragon-controller"
 onefile = true
-console = false
+windowed = true
 icon = "assets/redragon.ico"
-add-data = ["config/*;config", "assets/*;assets"]
+add-data = ["config/*;config", "assets/*;assets", "src/redragon_controller/gui/*;gui"]
 hidden-imports = [
     "hidapi",
     "pyyaml",
     "click",
     "rich",
-    "fastapi",
-    "uvicorn",
     "pydantic",
     "pydantic_settings",
+    "PySide6.QtCore",
+    "PySide6.QtWidgets",
+    "PySide6.QtGui",
+    "PySide6.QtSvg",
     "win32serviceutil",
     "win32service",
     "win32event",
@@ -86,7 +91,8 @@ collect-all = ["redragon_controller"]
 [tool.nuitka]
 standalone = true
 onefile = true
-include-package = ["redragon_controller"]
-include-data-dir = ["config=config", "assets=assets"]
-windows-icon-from-ico = "assets/redragon.ico"
 windows-console-mode = "disable"
+windows-icon-from-ico = "assets/redragon.ico"
+include-package = ["redragon_controller"]
+include-data-dir = ["config=config", "assets=assets", "src/redragon_controller/gui=gui"]
+enable-plugin = ["pywin32", "pyside6"]

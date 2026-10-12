@@ -25,13 +25,47 @@ REM Create icon
 echo Creating icon...
 python scripts/create_icon.py
 
-REM Build CLI (GUI, no console)
+REM Build Tray App (Main GUI - windowed, no console)
 echo.
-echo Building redragon-controller.exe (GUI)...
+echo Building redragon-tray.exe (Main GUI)...
 pyinstaller --clean --noconfirm ^
-  --name=redragon-controller ^
+  --name=redragon-tray ^
   --onefile ^
   --windowed ^
+  --icon=assets/redragon.ico ^
+  --add-data "config;config" ^
+  --add-data "assets;assets" ^
+  --add-data "src/redragon_controller/gui;gui" ^
+  --hidden-import=hidapi ^
+  --hidden-import=pyyaml ^
+  --hidden-import=click ^
+  --hidden-import=rich ^
+  --hidden-import=pydantic ^
+  --hidden-import=pydantic_settings ^
+  --hidden-import=PySide6.QtCore ^
+  --hidden-import=PySide6.QtWidgets ^
+  --hidden-import=PySide6.QtGui ^
+  --hidden-import=PySide6.QtSvg ^
+  --hidden-import=win32serviceutil ^
+  --hidden-import=win32service ^
+  --hidden-import=win32event ^
+  --hidden-import=servicemanager ^
+  --collect-all=redragon_controller ^
+  src/redragon_controller/tray_app.py
+
+if errorlevel 1 (
+    echo ERROR: Tray app build failed
+    pause
+    exit /b 1
+)
+
+REM Build CLI (for command-line usage)
+echo.
+echo Building redragon-cli.exe (CLI)...
+pyinstaller --clean --noconfirm ^
+  --name=redragon-cli ^
+  --onefile ^
+  --console ^
   --icon=assets/redragon.ico ^
   --add-data "config;config" ^
   --add-data "assets;assets" ^
@@ -39,14 +73,8 @@ pyinstaller --clean --noconfirm ^
   --hidden-import=pyyaml ^
   --hidden-import=click ^
   --hidden-import=rich ^
-  --hidden-import=fastapi ^
-  --hidden-import=uvicorn ^
   --hidden-import=pydantic ^
   --hidden-import=pydantic_settings ^
-  --hidden-import=win32serviceutil ^
-  --hidden-import=win32service ^
-  --hidden-import=win32event ^
-  --hidden-import=servicemanager ^
   --collect-all=redragon_controller ^
   src/redragon_controller/cli.py
 
@@ -70,8 +98,6 @@ pyinstaller --clean --noconfirm ^
   --hidden-import=pyyaml ^
   --hidden-import=click ^
   --hidden-import=rich ^
-  --hidden-import=fastapi ^
-  --hidden-import=uvicorn ^
   --hidden-import=pydantic ^
   --hidden-import=pydantic_settings ^
   --hidden-import=win32serviceutil ^
@@ -90,6 +116,17 @@ if errorlevel 1 (
 REM Create installer scripts
 echo.
 echo Creating installer scripts...
+@echo @echo off > dist/install_tray.bat
+@echo echo Installing Redragon Controller Tray App... >> dist/install_tray.bat
+@echo echo. >> dist/install_tray.bat
+@echo echo The tray app will start automatically on login. >> dist/install_tray.bat
+@echo echo. >> dist/install_tray.bat
+@echo echo To add to startup: >> dist/install_tray.bat
+@echo echo   1. Press Win+R, type: shell:startup >> dist/install_tray.bat
+@echo echo   2. Create shortcut to redragon-tray.exe in that folder >> dist/install_tray.bat
+@echo echo. >> dist/install_tray.bat
+@echo pause >> dist/install_tray.bat
+
 @echo @echo off > dist/install_service.bat
 @echo echo Installing Redragon Controller Service... >> dist/install_service.bat
 @echo redragon-service.exe install >> dist/install_service.bat
@@ -98,8 +135,6 @@ echo Creating installer scripts...
 @echo redragon-service.exe start >> dist/install_service.bat
 @echo echo. >> dist/install_service.bat
 @echo echo Service installed and started! >> dist/install_service.bat
-@echo echo API available at: http://localhost:8080 >> dist/install_service.bat
-@echo echo Web UI: http://localhost:8080 >> dist/install_service.bat
 @echo echo. >> dist/install_service.bat
 @echo pause >> dist/install_service.bat
 
@@ -114,7 +149,8 @@ echo Creating installer scripts...
 REM Verify
 echo.
 echo Verifying builds...
-dist\redragon-controller.exe --help
+dist\redragon-tray.exe --help 2>nul || echo (tray app has no --help, this is expected)
+dist\redragon-cli.exe --help
 dist\redragon-service.exe --help
 
 echo.
@@ -123,15 +159,16 @@ echo BUILD SUCCESSFUL!
 echo ===========================================
 echo.
 echo Output files in dist\:
-echo   - redragon-controller.exe  (GUI app, run directly)
-echo   - redragon-service.exe     (Service manager)
-echo   - install_service.bat      (Run as Admin to install service)
-echo   - uninstall_service.bat    (Run as Admin to remove service)
+echo   - redragon-tray.exe      (MAIN APP - System Tray + Window)
+echo   - redragon-cli.exe       (Command-line interface)
+echo   - redragon-service.exe   (Windows Service manager)
+echo   - install_tray.bat       (Tray app startup helper)
+echo   - install_service.bat    (Run as Admin to install service)
+echo   - uninstall_service.bat  (Run as Admin to remove service)
 echo.
-echo To install as Windows Service (run as Administrator):
-echo   dist\install_service.bat
-echo.
-echo To run as regular app:
-echo   dist\redragon-controller.exe
+echo USAGE:
+echo   1. Run redragon-tray.exe directly for the GUI with system tray
+echo   2. Or install as service: dist\install_service.bat (as Admin)
+echo   3. CLI: redragon-cli.exe --help
 echo.
 pause

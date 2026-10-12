@@ -30,6 +30,17 @@ from .windows_service import (
     main as service_main,
 )
 
+# GUI (optional - requires PySide6)
+try:
+    from .gui import (
+        MainWindow,
+        TrayApplication,
+        main as gui_main,
+    )
+    _GUI_AVAILABLE = True
+except ImportError:
+    _GUI_AVAILABLE = False
+
 __all__ = [
     "HIDTransport",
     "TransportError",
@@ -58,3 +69,10 @@ __all__ = [
     "run_as_console",
     "service_main",
 ]
+
+if _GUI_AVAILABLE:
+    __all__.extend([
+        "MainWindow",
+        "TrayApplication",
+        "gui_main",
+    ])

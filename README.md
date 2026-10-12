@@ -10,6 +10,8 @@ Built with Python + hidapi, containerized with Docker, reverse-engineered using 
 - 🌐 **REST API** - Control via HTTP for integrations
 - 📱 **Web UI** - Browser-based configuration
 - 🔌 **Plugin System** - Extend with custom effects/integrations
+- 🖥️ **Modern GUI** - Native PySide6 window with system tray, German UI
+- ⌨️ **Per-Key Customization** - Every key individually configurable
 
 ## Supported Keyboards
 | Model | VID | PID | Status |
@@ -34,7 +36,7 @@ docker run -d \
 **Option 1: Download Release** (Recommended)
 - Go to [GitHub Releases](https://github.com/taskengineassistant/redragon-controller/releases)
 - Download `redragon-controller-vX.Y.Z-windows-x64.zip`
-- Extract and run `install_service.bat` as **Administrator**
+- Extract and run `redragon-tray.exe` (Main GUI App)
 
 **Option 2: Build Yourself**
 ```cmd
@@ -45,8 +47,32 @@ scripts\build_windows.bat
 **Option 3: Python Native**
 ```powershell
 pip install -e ".[windows]"
-redragon-service install
-redragon-service start
+redragon-tray
+```
+
+### Main GUI App (`redragon-tray.exe`)
+The **primary way to use Redragon Controller** - a native Windows application with:
+- **System Tray** - Runs in background, click to open window
+- **Modern German UI** - 6 tabs: Dashboard, RGB, Keymap, Macros, Profiles, Settings
+- **Per-Key RGB** - Click any key to set individual color
+- **Visual Keyboard** - Interactive TKL/Full-size keyboard display
+- **Macro Recorder** - Record keystrokes as macros
+- **Profile Management** - Save to onboard memory + local files
+- **Auto-start** - Optional Windows startup integration
+
+```cmd
+# Run directly (shows window, minimizes to tray on close)
+redragon-tray.exe
+
+# Or add shortcut to shell:startup for auto-start
+```
+
+### CLI (`redragon-cli.exe`)
+Command-line interface for scripts/automation:
+```cmd
+redragon-cli.exe --discover
+redragon-cli.exe --set-color ff0000 --zone all
+redragon-cli.exe --effect breathing --color 00ff00 --speed 5
 ```
 
 ### Native Python (Linux/macOS)
@@ -119,12 +145,28 @@ redragon-controller/
 │   ├── keymap.py             # Key remapping & macros
 │   ├── profiles.py           # Profile management
 │   ├── api.py                # FastAPI REST server
-│   └── cli.py                # Command-line interface
+│   ├── cli.py                # Command-line interface
+│   ├── windows_service.py    # Windows Service wrapper
+│   └── gui/                  # PySide6 GUI package
+│       ├── __init__.py
+│       ├── i18n.py           # German translations
+│       ├── keyboard_visualizer.py
+│       ├── rgb_panel.py
+│       ├── keymap_panel.py
+│       ├── macros_panel.py
+│       ├── profiles_panel.py
+│       ├── settings_panel.py
+│       ├── dashboard_panel.py
+│       ├── main_window.py
+│       └── tray_app.py
 ├── config/
 │   ├── devices.yaml          # Device definitions
 │   ├── effects.yaml          # Built-in effects
-│   └── default_profile.yaml  # Default keymap/RGB
-├── web-ui/                   # React/Vue frontend
+│   ├── default_profile.yaml  # Default keymap/RGB
+│   └── 99-redragon.rules     # Udev rules (Linux)
+├── assets/                   # Icons, images
+├── scripts/                  # Build/install scripts
+├── web-ui/                   # React/Vue frontend (optional)
 ├── tests/
 ├── Dockerfile
 ├── docker-compose.yml
