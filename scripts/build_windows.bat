@@ -16,10 +16,11 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Install dependencies
+# Install dependencies
 echo Installing dependencies...
 pip install --upgrade pip setuptools wheel
 pip install -e ".[windows,build]"
+pip install Pillow
 
 REM Create icon
 echo Creating icon...

@@ -29,7 +29,7 @@ dependencies = [
     "pydantic-settings>=2.1",
     "PySide6>=6.6",
 ]
-optional-dependencies = {dev = ["pytest>=7.4", "pytest-asyncio>=0.23", "pytest-cov>=4.1", "ruff>=0.1", "mypy>=1.8", "pre-commit>=3.6"], web = ["fastapi>=0.109", "uvicorn>=0.27", "jinja2>=3.1", "websockets>=12.0"], windows = ["pywin32>=306", "winsvc>=0.1"], build = ["pyinstaller>=6.0", "nuitka>=1.0"]}
+optional-dependencies = {dev = ["pytest>=7.4", "pytest-asyncio>=0.23", "pytest-cov>=4.1", "ruff>=0.1", "mypy>=1.8", "pre-commit>=3.6"], web = ["fastapi>=0.109", "uvicorn>=0.27", "jinja2>=3.1", "websockets>=12.0"], windows = ["pywin32>=306", "winsvc>=0.1"], build = ["pyinstaller>=6.0", "nuitka>=1.0", "Pillow>=10.0"]}
 
 [project.scripts]
 redragon = "redragon_controller.cli:main"
