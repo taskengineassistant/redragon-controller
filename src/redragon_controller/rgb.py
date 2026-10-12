@@ -12,8 +12,11 @@ import threading
 from .protocol import (
     Command, RGBZone, RGBEffect, Color, ReportID,
     build_command, parse_response,
-    cmd_set_color, cmd_set_effect, cmd_set_brightness, cmd_set_speed
+    cmd_set_color, cmd_set_effect, cmd_set_brightness, cmd_set_speed,
 )
+
+# Alias for backwards compatibility
+Zone = RGBZone
 from .hid_transport import HIDTransport, TransportError
 
 
