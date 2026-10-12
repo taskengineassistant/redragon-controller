@@ -52,7 +52,7 @@ pyinstaller --clean --noconfirm ^
   --hidden-import=win32event ^
   --hidden-import=servicemanager ^
   --collect-all=redragon_controller ^
-  src/redragon_controller/tray_app.py
+  src/redragon_controller/tray_entry.py
 
 if errorlevel 1 (
     echo ERROR: Tray app build failed
@@ -77,7 +77,7 @@ pyinstaller --clean --noconfirm ^
   --hidden-import=pydantic ^
   --hidden-import=pydantic_settings ^
   --collect-all=redragon_controller ^
-  src/redragon_controller/cli.py
+  src/redragon_controller/cli_entry.py
 
 if errorlevel 1 (
     echo ERROR: CLI build failed
@@ -106,7 +106,7 @@ pyinstaller --clean --noconfirm ^
   --hidden-import=win32event ^
   --hidden-import=servicemanager ^
   --collect-all=redragon_controller ^
-  src/redragon_controller/windows_service.py
+  src/redragon_controller/service_entry.py
 
 if errorlevel 1 (
     echo ERROR: Service build failed

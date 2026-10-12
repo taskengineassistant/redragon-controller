@@ -37,10 +37,10 @@ redragon-gui = "redragon_controller.gui:main"
 redragon-tray = "redragon_controller.tray_app:main"
 
 [project.entry-points."console_scripts"]
-redragon = "redragon_controller.cli:main"
+redragon = "redragon_controller.cli_entry:main"
 redragon-gui = "redragon_controller.gui:main"
-redragon-tray = "redragon_controller.tray_app:main"
-redragon-service = "redragon_controller.windows_service:main"
+redragon-tray = "redragon_controller.tray_entry:main"
+redragon-service = "redragon_controller.service_entry:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

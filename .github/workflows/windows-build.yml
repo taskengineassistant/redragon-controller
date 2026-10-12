@@ -65,7 +65,7 @@ jobs:
             --hidden-import=win32event ^
             --hidden-import=servicemanager ^
             --collect-all=redragon_controller ^
-            src/redragon_controller/tray_app.py
+            src/redragon_controller/tray_entry.py
         shell: cmd
       
       - name: Build CLI Executable (PyInstaller)
@@ -84,7 +84,7 @@ jobs:
             --hidden-import=pydantic ^
             --hidden-import=pydantic_settings ^
             --collect-all=redragon_controller ^
-            src/redragon_controller/cli.py
+            src/redragon_controller/cli_entry.py
         shell: cmd
       
       - name: Build Service Executable (PyInstaller)
@@ -107,7 +107,7 @@ jobs:
             --hidden-import=win32event ^
             --hidden-import=servicemanager ^
             --collect-all=redragon_controller ^
-            src/redragon_controller/windows_service.py
+            src/redragon_controller/service_entry.py
         shell: cmd
       
       - name: Verify executables
@@ -225,11 +225,10 @@ jobs:
             --include-data-dir=config=config ^
             --include-data-dir=assets=assets ^
             --include-data-dir=src/redragon_controller/gui=gui ^
-            --enable-plugin=pywin32 ^
             --enable-plugin=pyside6 ^
             --output-dir=dist_nuitka ^
             --output-filename=redragon-tray-nuitka.exe ^
-            src/redragon_controller/tray_app.py
+            src/redragon_controller/tray_entry.py
         shell: cmd
       
       - name: Build CLI with Nuitka
@@ -242,10 +241,10 @@ jobs:
             --include-package=redragon_controller ^
             --include-data-dir=config=config ^
             --include-data-dir=assets=assets ^
-            --enable-plugin=pywin32 ^
+            --enable-plugin=pyside6 ^
             --output-dir=dist_nuitka ^
             --output-filename=redragon-cli-nuitka.exe ^
-            src/redragon_controller/cli.py
+            src/redragon_controller/cli_entry.py
         shell: cmd
       
       - name: Upload Nuitka artifacts
