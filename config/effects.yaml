@@ -1,0 +1,304 @@
+# Built-in RGB Effects Library
+# Predefined effects that work across all supported Redragon keyboards
+
+effects:
+  # Static colors
+  - id: "static_red"
+    name: "Static Red"
+    effect: "static"
+    color: "#ff0000"
+    brightness: 255
+    zone: "all"
+    description: "Solid red color"
+
+  - id: "static_green"
+    name: "Static Green"
+    effect: "static"
+    color: "#00ff00"
+    brightness: 255
+    zone: "all"
+    description: "Solid green color"
+
+  - id: "static_blue"
+    name: "Static Blue"
+    effect: "static"
+    color: "#0000ff"
+    brightness: 255
+    zone: "all"
+    description: "Solid blue color"
+
+  - id: "static_white"
+    name: "Static White"
+    effect: "static"
+    color: "#ffffff"
+    brightness: 255
+    zone: "all"
+    description: "Solid white color"
+
+  - id: "static_purple"
+    name: "Static Purple"
+    effect: "static"
+    color: "#8000ff"
+    brightness: 255
+    zone: "all"
+    description: "Solid purple color"
+
+  - id: "static_cyan"
+    name: "Static Cyan"
+    effect: "static"
+    color: "#00ffff"
+    brightness: 255
+    zone: "all"
+    description: "Solid cyan color"
+
+  - id: "static_yellow"
+    name: "Static Yellow"
+    effect: "static"
+    color: "#ffff00"
+    brightness: 255
+    zone: "all"
+    description: "Solid yellow color"
+
+  # Breathing effects
+  - id: "breathing_red"
+    name: "Breathing Red"
+    effect: "breathing"
+    color: "#ff0000"
+    speed: 64
+    brightness: 255
+    zone: "all"
+    description: "Slow red breathing"
+
+  - id: "breathing_blue"
+    name: "Breathing Blue"
+    effect: "breathing"
+    color: "#0066ff"
+    speed: 64
+    brightness: 255
+    zone: "all"
+    description: "Slow blue breathing"
+
+  - id: "breathing_rainbow"
+    name: "Breathing Rainbow"
+    effect: "breathing"
+    color: "#ff0000"
+    speed: 96
+    brightness: 255
+    zone: "all"
+    description: "Rainbow color breathing"
+
+  # Wave effects
+  - id: "wave_horizontal"
+    name: "Horizontal Wave"
+    effect: "wave"
+    color: "#ff0000"
+    speed: 128
+    direction: 0
+    brightness: 255
+    zone: "all"
+    description: "Left-to-right wave"
+
+  - id: "wave_vertical"
+    name: "Vertical Wave"
+    effect: "wave"
+    color: "#00ff00"
+    speed: 128
+    direction: 2
+    brightness: 255
+    zone: "all"
+    description: "Top-to-bottom wave"
+
+  - id: "rainbow_wave"
+    name: "Rainbow Wave"
+    effect: "rainbow_wave"
+    speed: 128
+    direction: 0
+    brightness: 255
+    zone: "all"
+    description: "Moving rainbow wave"
+
+  # Reactive effects
+  - id: "reactive_red"
+    name: "Reactive Red"
+    effect: "reactive"
+    color: "#ff0000"
+    speed: 192
+    brightness: 255
+    zone: "all"
+    description: "Keys light up red on press"
+
+  - id: "reactive_white"
+    name: "Reactive White"
+    effect: "reactive"
+    color: "#ffffff"
+    speed: 255
+    brightness: 255
+    zone: "all"
+    description: "Quick white flash on press"
+
+  - id: "reactive_cyan"
+    name: "Reactive Cyan"
+    effect: "reactive"
+    color: "#00ffff"
+    speed: 192
+    brightness: 255
+    zone: "all"
+    description: "Cyan ripple on press"
+
+  # Ripple effects
+  - id: "ripple_red"
+    name: "Ripple Red"
+    effect: "ripple"
+    color: "#ff0000"
+    speed: 128
+    brightness: 255
+    zone: "all"
+    description: "Red ripple from keypress"
+
+  - id: "ripple_rainbow"
+    name: "Ripple Rainbow"
+    effect: "ripple"
+    color: "#ff0000"
+    speed: 128
+    brightness: 255
+    zone: "all"
+    description: "Rainbow ripple from keypress"
+
+  # Spectrum/Cycle effects
+  - id: "spectrum_slow"
+    name: "Spectrum Slow"
+    effect: "spectrum"
+    speed: 32
+    brightness: 255
+    zone: "all"
+    description: "Very slow rainbow cycle"
+
+  - id: "spectrum_normal"
+    name: "Spectrum Normal"
+    effect: "spectrum"
+    speed: 128
+    brightness: 255
+    zone: "all"
+    description: "Normal rainbow cycle"
+
+  - id: "spectrum_fast"
+    name: "Spectrum Fast"
+    effect: "spectrum"
+    speed: 224
+    brightness: 255
+    zone: "all"
+    description: "Fast rainbow cycle"
+
+  # Special effects
+  - id: "starlight_white"
+    name: "Starlight White"
+    effect: "starlight"
+    color: "#ffffff"
+    speed: 128
+    brightness: 255
+    zone: "all"
+    description: "Random white twinkles"
+
+  - id: "starlight_rgb"
+    name: "Starlight RGB"
+    effect: "starlight"
+    color: "#ff0000"
+    speed: 128
+    brightness: 255
+    zone: "all"
+    description: "Random RGB twinkles"
+
+  - id: "scan_horizontal"
+    name: "Horizontal Scan"
+    effect: "scan"
+    color: "#ff0000"
+    speed: 192
+    direction: 0
+    brightness: 255
+    zone: "all"
+    description: "Horizontal scanning line"
+
+  - id: "scan_vertical"
+    name: "Vertical Scan"
+    effect: "scan"
+    color: "#00ff00"
+    speed: 192
+    direction: 2
+    brightness: 255
+    zone: "all"
+    description: "Vertical scanning line"
+
+  # Zone-specific effects
+  - id: "wasd_red"
+    name: "WASD Red"
+    effect: "static"
+    color: "#ff0000"
+    brightness: 255
+    zone: "wasd"
+    description: "Red WASD cluster only"
+
+  - id: "arrows_blue"
+    name: "Arrows Blue"
+    effect: "static"
+    color: "#0066ff"
+    brightness: 255
+    zone: "arrows"
+    description: "Blue arrow keys only"
+
+  - id: "function_row_green"
+    name: "Function Row Green"
+    effect: "static"
+    color: "#00ff00"
+    brightness: 255
+    zone: "function"
+    description: "Green F1-F12 keys"
+
+  - id: "left_side_purple"
+    name: "Left Side Purple"
+    effect: "static"
+    color: "#8000ff"
+    brightness: 255
+    zone: "left"
+    description: "Purple left side"
+
+  - id: "right_side_orange"
+    name: "Right Side Orange"
+    effect: "static"
+    color: "#ff8000"
+    brightness: 255
+    zone: "right"
+    description: "Orange right side"
+
+  # Gaming presets
+  - id: "gaming_fps"
+    name: "FPS Gaming"
+    effect: "reactive"
+    color: "#ff0000"
+    speed: 255
+    brightness: 255
+    zone: "wasd"
+    description: "WASD reactive red for FPS"
+
+  - id: "gaming_moba"
+    name: "MOBA Gaming"
+    effect: "static"
+    color: "#ffff00"
+    brightness: 255
+    zone: "custom"
+    description: "QWERDF highlighted for MOBA"
+
+  - id: "gaming_mmo"
+    name: "MMO Gaming"
+    effect: "static"
+    color: "#ff00ff"
+    brightness: 255
+    zone: "numbers"
+    description: "Pink number row for MMO binds"
+
+  # Off
+  - id: "off"
+    name: "Off"
+    effect: "off"
+    brightness: 0
+    zone: "all"
+    description: "All LEDs off"

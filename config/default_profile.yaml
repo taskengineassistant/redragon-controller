@@ -1,0 +1,67 @@
+# Default Profile
+# Applied on first run if no profiles exist
+
+name: "Default"
+slot: 0
+
+# RGB Configuration
+rgb_effect: "static"
+rgb_color: "#ffffff"
+rgb_speed: 128
+rgb_direction: 0
+rgb_zone: "all"
+rgb_brightness: 255
+
+# Keymap - Layer 0 (Base)
+active_layer: 0
+layers:
+  0:
+    index: 0
+    name: "Base"
+    parent_layer: null
+    keymap: {}
+  1:
+    index: 1
+    name: "Gaming"
+    parent_layer: 0
+    keymap:
+      # WASD already mapped in base
+      43:  # A key
+        type: 0  # KEYCODE
+        data: "04"  # A
+      45:  # D key
+        type: 0
+        data: "07"  # D
+  2:
+    index: 2
+    name: "Media"
+    parent_layer: 0
+    keymap:
+      1:   # F1
+        type: 3  # MEDIA
+        data: "e2"  # Mute
+      2:   # F2
+        type: 3
+        data: "ea"  # Vol Down
+      3:   # F3
+        type: 3
+        data: "e9"  # Vol Up
+      5:   # F5
+        type: 3
+        data: "b6"  # Prev Track
+      6:   # F6
+        type: 3
+        data: "cd"  # Play/Pause
+      7:   # F7
+        type: 3
+        data: "b5"  # Next Track
+
+macros: {}
+
+# Metadata
+created: ""
+modified: ""
+device_model: ""
+firmware_version: ""
+tags: ["default", "factory"]
+description: "Factory default profile"

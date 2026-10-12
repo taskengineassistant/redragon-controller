@@ -1,0 +1,110 @@
+# Redragon Device Definitions
+# Maps VID/PID to device capabilities and key layouts
+
+devices:
+  - vendor_id: 0x258a
+    product_id: 0x0001
+    name: "K585 RGB"
+    layout: "tkl_87"
+    rgb_zones: 8
+    rgb_keys: 87
+    onboard_profiles: 5
+    has_macro: true
+    has_layers: true
+    layers_count: 4
+    firmware_min: "1.00"
+
+  - vendor_id: 0x258a
+    product_id: 0x0002
+    name: "K552 RGB"
+    layout: "tkl_87"
+    rgb_zones: 8
+    rgb_keys: 87
+    onboard_profiles: 5
+    has_macro: true
+    has_layers: true
+    layers_count: 4
+    firmware_min: "1.00"
+
+  - vendor_id: 0x258a
+    product_id: 0x0003
+    name: "K530 Pro"
+    layout: "compact_60"
+    rgb_zones: 6
+    rgb_keys: 61
+    onboard_profiles: 3
+    has_macro: true
+    has_layers: true
+    layers_count: 4
+    firmware_min: "1.10"
+
+  - vendor_id: 0x0483
+    product_id: 0x5750
+    name: "K585 RGB (STM32)"
+    layout: "tkl_87"
+    rgb_zones: 8
+    rgb_keys: 87
+    onboard_profiles: 5
+    has_macro: true
+    has_layers: true
+    layers_count: 4
+    firmware_min: "2.00"
+
+  - vendor_id: 0x0483
+    product_id: 0x5751
+    name: "K552 RGB (STM32)"
+    layout: "tkl_87"
+    rgb_zones: 8
+    rgb_keys: 87
+    onboard_profiles: 5
+    has_macro: true
+    has_layers: true
+    layers_count: 4
+    firmware_min: "2.00"
+
+# Key layouts
+layouts:
+  tkl_87:
+    name: "TKL 87-key"
+    rows: 6
+    cols: 14
+    key_count: 87
+    # Key index -> (row, col) mapping for visualizers
+    key_positions:
+      0: [0, 0]   # Esc
+      1: [1, 0]   # F1
+      2: [2, 0]   # F2
+      # ... (truncated for brevity)
+  
+  compact_60:
+    name: "60% Compact"
+    rows: 5
+    cols: 14
+    key_count: 61
+    key_positions: {}
+
+# Default effects for each device
+default_effects:
+  K585 RGB:
+    - name: "Gaming Red"
+      effect: "static"
+      color: "#ff0000"
+      zone: "wasd"
+    - name: "Rainbow Wave"
+      effect: "rainbow_wave"
+      speed: 128
+      direction: 0
+    - name: "Breathing Blue"
+      effect: "breathing"
+      color: "#0066ff"
+      speed: 64
+  
+  K552 RGB:
+    - name: "Static White"
+      effect: "static"
+      color: "#ffffff"
+      zone: "all"
+    - name: "Reactive Green"
+      effect: "reactive"
+      color: "#00ff00"
+      speed: 192

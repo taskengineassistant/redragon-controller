@@ -1,0 +1,24 @@
+# Redragon Keyboard udev rules
+# Allows non-root users in 'plugdev' group to access Redragon HID devices
+
+# Redragon K585 RGB
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="258a", ATTRS{idProduct}=="0001", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="258a", ATTRS{idProduct}=="0001", MODE="0666", GROUP="plugdev"
+
+# Redragon K552 RGB
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="258a", ATTRS{idProduct}=="0002", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="258a", ATTRS{idProduct}=="0002", MODE="0666", GROUP="plugdev"
+
+# Redragon K530 Pro
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="258a", ATTRS{idProduct}=="0003", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="258a", ATTRS{idProduct}=="0003", MODE="0666", GROUP="plugdev"
+
+# STM32-based Redragon keyboards (alternative VID/PID)
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5750", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5750", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5751", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5751", MODE="0666", GROUP="plugdev"
+
+# Generic Redragon (by manufacturer string)
+SUBSYSTEM=="hidraw", ATTRS{manufacturer}=="Redragon*", MODE="0666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{manufacturer}=="Redragon*", MODE="0666", GROUP="plugdev"

@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  redragon-controller:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: redragon-controller:latest
+    container_name: redragon-controller
+    restart: unless-stopped
+    # Device access for HID
+    devices:
+      - "/dev/hidraw0:/dev/hidraw0"
+      - "/dev/hidraw1:/dev/hidraw1"
+      - "/dev/hidraw2:/dev/hidraw2"
+      - "/dev/hidraw3:/dev/hidraw3"
+      - "/dev/hidraw4:/dev/hidraw4"
+      - "/dev/hidraw5:/dev/hidraw5"
+      - "/dev/hidraw6:/dev/hidraw6"
+      - "/dev/hidraw7:/dev/hidraw7"
+      - "/dev/usb:/dev/usb"
+    # Alternative: privileged mode (less secure but easier)
+    # privileged: true
+    # Capabilities for USB access
+    cap_add:
+      - SYS_RAWIO
+    # Volumes for config and profiles
+    volumes:
+      - ./config:/app/config:ro
+      - redragon-profiles:/home/redragon/.config/redragon
+      - redragon-logs:/var/log/redragon
+    # Network for API
+    ports:
+      - "8080:8080"
+    # Environment
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    # Health check
+    healthcheck:
+      test: ["CMD", "redragon", "info"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: Web UI development server
+  # web-ui:
+  #   build:
+  #     context: ./web-ui
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./web-ui:/app
+  #     - /app/node_modules
+  #   environment:
+  #     - VITE_API_URL=http://localhost:8080
+
+volumes:
+  redragon-profiles:
+  redragon-logs:

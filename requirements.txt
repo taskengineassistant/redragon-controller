@@ -1,0 +1,21 @@
+# Production dependencies
+hidapi>=0.14.0
+pyyaml>=6.0
+click>=8.1
+rich>=13.0
+fastapi>=0.109
+uvicorn>=0.27
+pydantic>=2.5
+pydantic-settings>=2.1
+
+# Development dependencies (install with: pip install -e ".[dev]")
+# pytest>=7.4
+# pytest-asyncio>=0.23
+# pytest-cov>=4.1
+# ruff>=0.1
+# mypy>=1.8
+# pre-commit>=3.6
+
+# Web UI dependencies (install with: pip install -e ".[web]")
+# jinja2>=3.1
+# websockets>=12.0

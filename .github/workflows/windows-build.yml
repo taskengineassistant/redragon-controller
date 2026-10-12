@@ -1,0 +1,201 @@
+# GitHub Actions - Windows Build & Release
+name: Windows Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: x64
+          cache: pip
+      
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -e ".[windows,build]"
+      
+      - name: Create icon
+        run: python scripts/create_icon.py
+      
+      - name: Build CLI Executable (PyInstaller)
+        run: |
+          pyinstaller --clean --noconfirm ^
+            --name=redragon-controller ^
+            --onefile ^
+            --windowed ^
+            --icon=assets/redragon.ico ^
+            --add-data "config;config" ^
+            --add-data "assets;assets" ^
+            --hidden-import=hidapi ^
+            --hidden-import=pyyaml ^
+            --hidden-import=click ^
+            --hidden-import=rich ^
+            --hidden-import=fastapi ^
+            --hidden-import=uvicorn ^
+            --hidden-import=pydantic ^
+            --hidden-import=pydantic_settings ^
+            --hidden-import=win32serviceutil ^
+            --hidden-import=win32service ^
+            --hidden-import=win32event ^
+            --hidden-import=servicemanager ^
+            --collect-all=redragon_controller ^
+            src/redragon_controller/cli.py
+        shell: cmd
+      
+      - name: Build Service Executable (PyInstaller)
+        run: |
+          pyinstaller --clean --noconfirm ^
+            --name=redragon-service ^
+            --onefile ^
+            --console ^
+            --icon=assets/redragon.ico ^
+            --add-data "config;config" ^
+            --add-data "assets;assets" ^
+            --hidden-import=hidapi ^
+            --hidden-import=pyyaml ^
+            --hidden-import=click ^
+            --hidden-import=rich ^
+            --hidden-import=fastapi ^
+            --hidden-import=uvicorn ^
+            --hidden-import=pydantic ^
+            --hidden-import=pydantic_settings ^
+            --hidden-import=win32serviceutil ^
+            --hidden-import=win32service ^
+            --hidden-import=win32event ^
+            --hidden-import=servicemanager ^
+            --collect-all=redragon_controller ^
+            src/redragon_controller/windows_service.py
+        shell: cmd
+      
+      - name: Verify executables
+        run: |
+          .\dist\redragon-controller.exe --help
+          .\dist\redragon-service.exe --help
+        shell: pwsh
+      
+      - name: Create installer scripts
+        run: |
+          @"
+          @echo off
+          echo Installing Redragon Controller Service...
+          redragon-service.exe install
+          echo.
+          echo Starting service...
+          redragon-service.exe start
+          echo.
+          echo Service installed and started!
+          echo API available at: http://localhost:8080
+          echo Web UI: http://localhost:8080
+          echo.
+          pause
+          "@ | Out-File -Encoding ASCII dist/install_service.bat
+          
+          @"
+          @echo off
+          echo Stopping and uninstalling Redragon Controller Service...
+          redragon-service.exe stop
+          redragon-service.exe uninstall
+          echo.
+          echo Service uninstalled!
+          pause
+          "@ | Out-File -Encoding ASCII dist/uninstall_service.bat
+        shell: pwsh
+      
+      - name: Package release
+        run: |
+          $version = "${{ github.ref_name }}"
+          $zipName = "redragon-controller-$version-windows-x64.zip"
+          Compress-Archive -Path dist\* -DestinationPath $zipName -Force
+          echo "RELEASE_ZIP=$zipName" >> $env:GITHUB_ENV
+        shell: pwsh
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: redragon-controller-windows
+          path: |
+            dist/redragon-controller.exe
+            dist/redragon-service.exe
+            dist/install_service.bat
+            dist/uninstall_service.bat
+          retention-days: 90
+      
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/redragon-controller.exe
+            dist/redragon-service.exe
+            dist/install_service.bat
+            dist/uninstall_service.bat
+            ${{ env.RELEASE_ZIP }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-windows-nuitka:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: x64
+      
+      - name: Install dependencies
+        run: |
+          pip install nuitka ordered-set zstandard
+          pip install -e ".[windows]"
+      
+      - name: Create icon
+        run: python scripts/create_icon.py
+      
+      - name: Build with Nuitka
+        run: |
+          python -m nuitka ^
+            --standalone ^
+            --onefile ^
+            --windows-console-mode=disable ^
+            --windows-icon-from-ico=assets/redragon.ico ^
+            --include-package=redragon_controller ^
+            --include-data-dir=config=config ^
+            --include-data-dir=assets=assets ^
+            --enable-plugin=pywin32 ^
+            --output-dir=dist_nuitka ^
+            --output-filename=redragon-controller-nuitka.exe ^
+            src/redragon_controller/cli.py
+        shell: cmd
+      
+      - name: Upload Nuitka artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: redragon-controller-nuitka
+          path: dist_nuitka/redragon-controller-nuitka.exe
+          retention-days: 90
