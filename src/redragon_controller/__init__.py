@@ -10,9 +10,8 @@ from .hid_transport import HIDTransport, TransportError
 from .protocol import (
     Command,
     ReportID,
-    RGBCommand,
-    KeyCommand,
     ProfileCommand,
+    KeyActionType,
     build_command,
     parse_response,
 )
@@ -46,9 +45,8 @@ __all__ = [
     "TransportError",
     "Command",
     "ReportID",
-    "RGBCommand",
-    "KeyCommand",
     "ProfileCommand",
+    "KeyActionType",
     "build_command",
     "parse_response",
     "RGBController",

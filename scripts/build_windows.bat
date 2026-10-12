@@ -147,6 +147,13 @@ echo Creating installer scripts...
 @echo echo Service uninstalled! >> dist/uninstall_service.bat
 @echo pause >> dist/uninstall_service.bat
 
+REM Copy config files and manage_service.ps1 to dist for release package
+copy config\devices.yaml dist\
+copy config\effects.yaml dist\
+copy config\default_profile.yaml dist\
+copy config\99-redragon.rules dist\
+copy scripts\manage_service.ps1 dist\
+
 REM Verify
 echo.
 echo Verifying builds...

@@ -18,7 +18,7 @@ permissions:
 jobs:
   build-windows:
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     
     steps:
       - name: Checkout
@@ -112,9 +112,10 @@ jobs:
       
       - name: Verify executables
         run: |
-          .\dist\redragon-cli.exe --help
-          .\dist\redragon-service.exe --help
-        shell: pwsh
+          dir dist\*.exe
+          dist\redragon-cli.exe --help
+          dist\redragon-service.exe --help
+        shell: cmd
       
       - name: Create installer scripts
         run: |
@@ -191,67 +192,3 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-windows-nuitka:
-    runs-on: windows-latest
-    timeout-minutes: 60
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          architecture: x64
-      
-      - name: Install dependencies
-        run: |
-          pip install nuitka ordered-set zstandard
-          pip install -e ".[windows]"
-          pip install Pillow
-      
-      - name: Create icon
-        run: python scripts/create_icon.py
-      
-      - name: Build Tray App with Nuitka
-        run: |
-          python -m nuitka ^
-            --standalone ^
-            --onefile ^
-            --windows-console-mode=disable ^
-            --windows-icon-from-ico=assets/redragon.ico ^
-            --include-package=redragon_controller ^
-            --include-data-dir=config=config ^
-            --include-data-dir=assets=assets ^
-            --include-data-dir=src/redragon_controller/gui=gui ^
-            --enable-plugin=pyside6 ^
-            --output-dir=dist_nuitka ^
-            --output-filename=redragon-tray-nuitka.exe ^
-            src/redragon_controller/tray_entry.py
-        shell: cmd
-      
-      - name: Build CLI with Nuitka
-        run: |
-          python -m nuitka ^
-            --standalone ^
-            --onefile ^
-            --windows-console-mode=disable ^
-            --windows-icon-from-ico=assets/redragon.ico ^
-            --include-package=redragon_controller ^
-            --include-data-dir=config=config ^
-            --include-data-dir=assets=assets ^
-            --enable-plugin=pyside6 ^
-            --output-dir=dist_nuitka ^
-            --output-filename=redragon-cli-nuitka.exe ^
-            src/redragon_controller/cli_entry.py
-        shell: cmd
-      
-      - name: Upload Nuitka artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: redragon-controller-nuitka
-          path: |
-            dist_nuitka/redragon-tray-nuitka.exe
-            dist_nuitka/redragon-cli-nuitka.exe
-          retention-days: 90
