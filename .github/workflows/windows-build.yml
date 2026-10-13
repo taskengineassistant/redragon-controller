@@ -45,7 +45,7 @@ jobs:
           pyinstaller --clean --noconfirm ^
             --name=redragon ^
             --onefile ^
-            --windowed ^
+            --console ^
             --icon=assets/redragon.ico ^
             --add-data "config;config" ^
             --add-data "assets;assets" ^

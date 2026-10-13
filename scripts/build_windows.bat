@@ -32,7 +32,7 @@ echo Building redragon.exe (Unified: GUI + Service + CLI)...
 pyinstaller --clean --noconfirm ^
   --name=redragon ^
   --onefile ^
-  --windowed ^
+  --console ^
   --icon=assets/redragon.ico ^
   --add-data "config;config" ^
   --add-data "assets;assets" ^

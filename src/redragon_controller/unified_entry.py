@@ -18,6 +18,13 @@ if getattr(sys, 'frozen', False):
 
 def run_gui():
     """Run the GUI/Tray application."""
+    # Hide console window on Windows when running GUI mode
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)  # SW_HIDE
+        except Exception:
+            pass
     from .tray_app import main as tray_main
     return tray_main()
 
