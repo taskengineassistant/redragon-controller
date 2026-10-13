@@ -40,10 +40,10 @@ jobs:
       - name: Create icon
         run: python scripts/create_icon.py
       
-      - name: Build Tray App Executable (PyInstaller)
+      - name: Build Unified Executable (PyInstaller)
         run: |
           pyinstaller --clean --noconfirm ^
-            --name=redragon-tray ^
+            --name=redragon ^
             --onefile ^
             --windowed ^
             --icon=assets/redragon.ico ^
@@ -65,80 +65,25 @@ jobs:
             --hidden-import=win32event ^
             --hidden-import=servicemanager ^
             --collect-all=redragon_controller ^
-            src/redragon_controller/tray_entry.py
+            src/redragon_controller/unified_entry.py
         shell: cmd
       
-      - name: Build CLI Executable (PyInstaller)
-        run: |
-          pyinstaller --clean --noconfirm ^
-            --name=redragon-cli ^
-            --onefile ^
-            --console ^
-            --icon=assets/redragon.ico ^
-            --add-data "config;config" ^
-            --add-data "assets;assets" ^
-            --hidden-import=hidapi ^
-            --hidden-import=pyyaml ^
-            --hidden-import=click ^
-            --hidden-import=rich ^
-            --hidden-import=pydantic ^
-            --hidden-import=pydantic_settings ^
-            --collect-all=redragon_controller ^
-            src/redragon_controller/cli_entry.py
-        shell: cmd
-      
-      - name: Build Service Executable (PyInstaller)
-        run: |
-          pyinstaller --clean --noconfirm ^
-            --name=redragon-service ^
-            --onefile ^
-            --console ^
-            --icon=assets/redragon.ico ^
-            --add-data "config;config" ^
-            --add-data "assets;assets" ^
-            --hidden-import=hidapi ^
-            --hidden-import=pyyaml ^
-            --hidden-import=click ^
-            --hidden-import=rich ^
-            --hidden-import=pydantic ^
-            --hidden-import=pydantic_settings ^
-            --hidden-import=win32serviceutil ^
-            --hidden-import=win32service ^
-            --hidden-import=win32event ^
-            --hidden-import=servicemanager ^
-            --collect-all=redragon_controller ^
-            src/redragon_controller/service_entry.py
-        shell: cmd
-      
-      - name: Verify executables
+      - name: Verify executable
         run: |
           dir dist\*.exe
-          dist\redragon-cli.exe --help
-          dist\redragon-service.exe --help
+          dist\redragon.exe --help
+          dist\redragon.exe cli --help
         shell: cmd
       
-      - name: Create installer scripts
+      - name: Create installer script
         run: |
-          @"
-          @echo off
-          echo Installing Redragon Controller Tray App...
-          echo.
-          echo The tray app will start automatically on login.
-          echo.
-          echo To add to startup:
-          echo   1. Press Win+R, type: shell:startup
-          echo   2. Create shortcut to redragon-tray.exe in that folder
-          echo.
-          pause
-          "@ | Out-File -Encoding ASCII dist/install_tray.bat
-          
           @"
           @echo off
           echo Installing Redragon Controller Service...
-          redragon-service.exe install
+          redragon.exe service install
           echo.
           echo Starting service...
-          redragon-service.exe start
+          redragon.exe service start
           echo.
           echo Service installed and started!
           echo.
@@ -148,8 +93,8 @@ jobs:
           @"
           @echo off
           echo Stopping and uninstalling Redragon Controller Service...
-          redragon-service.exe stop
-          redragon-service.exe uninstall
+          redragon.exe service stop
+          redragon.exe service uninstall
           echo.
           echo Service uninstalled!
           pause
@@ -169,10 +114,7 @@ jobs:
         with:
           name: redragon-controller-windows
           path: |
-            dist/redragon-tray.exe
-            dist/redragon-cli.exe
-            dist/redragon-service.exe
-            dist/install_tray.bat
+            dist/redragon.exe
             dist/install_service.bat
             dist/uninstall_service.bat
           retention-days: 90
@@ -182,10 +124,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            dist/redragon-tray.exe
-            dist/redragon-cli.exe
-            dist/redragon-service.exe
-            dist/install_tray.bat
+            dist/redragon.exe
             dist/install_service.bat
             dist/uninstall_service.bat
             ${{ env.RELEASE_ZIP }}
