@@ -50,6 +50,7 @@ class RedragonService(win32serviceutil.ServiceFramework):
         self.profiles = None
         self._last_device_check = 0
         self._device_check_interval = 10  # seconds
+        self._connection_retry_interval = 30  # seconds
 
     def SvcStop(self):
         """Called when service is stopping."""
@@ -59,11 +60,20 @@ class RedragonService(win32serviceutil.ServiceFramework):
         if self.worker_thread and self.worker_thread.is_alive():
             self.worker_thread.join(timeout=5)
 
+        if self.transport:
+            try:
+                self.transport.disconnect()
+            except Exception:
+                pass
+
         win32event.SetEvent(self.hWaitStop)
         self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
     def SvcDoRun(self):
-        """Main service loop."""
+        """Main service loop - must return quickly to avoid 1053 timeout."""
+        # Report START_PENDING immediately
+        self.ReportServiceStatus(win32service.SERVICE_START_PENDING)
+        
         servicemanager.LogMsg(
             servicemanager.EVENTLOG_INFORMATION_TYPE,
             servicemanager.PYS_SERVICE_STARTED,
@@ -71,38 +81,26 @@ class RedragonService(win32serviceutil.ServiceFramework):
         )
 
         self.is_running = True
-        self.main()
+        
+        # Start background worker IMMEDIATELY (non-blocking)
+        self.worker_thread = threading.Thread(
+            target=self._worker_loop,
+            daemon=True
+        )
+        self.worker_thread.start()
 
-        # Wait for stop signal
+        # Report RUNNING status - service is now "started" from SCM perspective
+        self.ReportServiceStatus(win32service.SERVICE_RUNNING)
+        servicemanager.LogInfoMsg("Redragon Controller Service started successfully")
+
+        # Wait for stop signal (this blocks until SvcStop is called)
         win32event.WaitForSingleObject(self.hWaitStop, win32event.INFINITE)
 
-    def main(self):
-        """Initialize and run the service."""
-        try:
-            servicemanager.LogInfoMsg("Redragon Controller Service starting...")
-
-            # Initial device connection attempt
-            self._connect_device()
-
-            # Start background worker for device monitoring and profile sync
-            self.worker_thread = threading.Thread(
-                target=self._worker_loop,
-                daemon=True
-            )
-            self.worker_thread.start()
-
-            servicemanager.LogInfoMsg("Redragon Controller Service started successfully")
-
-        except Exception as e:
-            servicemanager.LogErrorMsg(f"Service initialization failed: {e}")
-            self.is_running = False
-
     def _connect_device(self):
-        """Auto-discover and connect to Redragon device."""
+        """Auto-discover and connect to Redragon device. Non-blocking, returns bool."""
         try:
             devices = HIDTransport.discover()
             if not devices:
-                servicemanager.LogInfoMsg("No Redragon device found - will retry periodically")
                 return False
 
             # Use first discovered device
@@ -134,20 +132,24 @@ class RedragonService(win32serviceutil.ServiceFramework):
 
     def _worker_loop(self):
         """Background loop: monitor device, sync profiles, keep connection alive."""
+        # Initial connection attempt (non-blocking)
+        self._connect_device()
+        last_retry = time.time()
+
         while self.is_running:
             try:
                 current_time = time.time()
 
                 # Periodic device check / reconnect
-                if current_time - self._last_device_check >= self._device_check_interval:
-                    self._last_device_check = current_time
-
-                    if not self.transport or not self.transport.is_connected():
-                        servicemanager.LogInfoMsg("Device disconnected - attempting reconnect...")
+                if not self.transport or not self.transport.is_connected():
+                    # Only retry periodically to avoid spam
+                    if current_time - last_retry >= self._connection_retry_interval:
+                        last_retry = current_time
+                        servicemanager.LogInfoMsg("Attempting device reconnect...")
                         self._connect_device()
-                    else:
-                        # Device connected - could do periodic profile sync here
-                        pass
+                else:
+                    # Device connected - could do periodic profile sync here
+                    pass
 
                 # Sleep a bit to avoid busy loop
                 time.sleep(1)
