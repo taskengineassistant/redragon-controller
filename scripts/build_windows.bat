@@ -92,8 +92,8 @@ copy scripts\manage_service.ps1 dist\
 REM Verify
 echo.
 echo Verifying build...
-dist\redragon.exe --help
 dist\redragon.exe cli --help
+dist\redragon.exe service --help
 
 echo.
 echo ===========================================

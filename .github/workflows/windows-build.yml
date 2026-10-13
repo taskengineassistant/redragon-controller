@@ -71,8 +71,8 @@ jobs:
       - name: Verify executable
         run: |
           dir dist\*.exe
-          dist\redragon.exe --help
           dist\redragon.exe cli --help
+          dist\redragon.exe service --help
         shell: cmd
       
       - name: Create installer script
