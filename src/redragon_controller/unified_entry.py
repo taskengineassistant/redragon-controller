@@ -11,9 +11,10 @@ import argparse
 
 # Add src to path for frozen executable
 if getattr(sys, 'frozen', False):
-    # Running as PyInstaller bundle
-    import sysconfig
-    sys.path.insert(0, sys._MEIPASS)
+    # Running as PyInstaller bundle - _MEIPASS contains extracted files
+    bundle_dir = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+    if bundle_dir not in sys.path:
+        sys.path.insert(0, bundle_dir)
 
 
 def run_gui():
@@ -25,13 +26,16 @@ def run_gui():
             ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)  # SW_HIDE
         except Exception:
             pass
-    from .tray_app import main as tray_main
+    
+    # Absolute import for frozen executable
+    from redragon_controller.tray_app import main as tray_main
     return tray_main()
 
 
 def run_service():
     """Run as Windows Service."""
-    from .windows_service import main as service_main
+    # Absolute import for frozen executable
+    from redragon_controller.windows_service import main as service_main
     # Pass remaining args to service main
     sys.argv = [sys.argv[0]] + sys.argv[2:]  # Remove 'redragon' and 'service'
     return service_main()
@@ -39,7 +43,8 @@ def run_service():
 
 def run_cli():
     """Run CLI commands."""
-    from .cli import main as cli_main
+    # Absolute import for frozen executable
+    from redragon_controller.cli import main as cli_main
     # Pass remaining args to CLI
     sys.argv = [sys.argv[0]] + sys.argv[1:]  # Remove 'redragon'
     return cli_main()
